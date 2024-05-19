@@ -1,0 +1,5 @@
+# Ignore dataset files
+Data/*.csv
+
+# Ignore virtual environment
+venv/
