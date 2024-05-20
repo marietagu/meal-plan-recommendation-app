@@ -5,7 +5,7 @@ import pandas as pd
 from model import recommend,output_recommended_recipes
 
 
-dataset = pd.read_csv('Data/dataset.csv',compression='gzip')
+dataset=pd.read_csv('Data/dataset.csv',compression='gzip')
 
 app = FastAPI()
 
@@ -16,8 +16,7 @@ class params(BaseModel):
 
 class PredictionIn(BaseModel):
     nutrition_input:conlist(float, min_items=9, max_items=9)
-    ingredients_include:list[str] = []
-    ingredients_exclude:list[str] = []
+    ingredients:list[str]=[]
     params:Optional[params]
 
 
@@ -44,12 +43,12 @@ class PredictionOut(BaseModel):
 
 @app.get("/")
 def home():
-    return {"message": "Welcome to the Meal Plan Recommendation API!"}
+    return {"health_check": "OK"}
 
 
 @app.post("/predict/",response_model=PredictionOut)
 def update_item(prediction_input:PredictionIn):
-    recommendation_dataframe=recommend(dataset,prediction_input.nutrition_input,prediction_input.ingredients_include,prediction_input.ingredients_exclude,prediction_input.params.dict())
+    recommendation_dataframe=recommend(dataset,prediction_input.nutrition_input,prediction_input.ingredients,prediction_input.params.dict())
     output=output_recommended_recipes(recommendation_dataframe)
     if output is None:
         return {"output":None}

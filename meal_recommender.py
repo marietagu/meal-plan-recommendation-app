@@ -3,26 +3,27 @@ from generator import Generator
 import pandas as pd
 from streamlit_echarts import st_echarts
 
-st.set_page_config(page_title="Custom Food Recommendation", page_icon="🔍", layout="wide")
+st.set_page_config(page_title="Meal Recommender", layout="wide")
 nutrition_values = ['Calories', 'FatContent', 'SaturatedFatContent', 'CholesterolContent', 'SodiumContent',
-                    'CarbohydrateContent', 'FiberContent', 'SugarContent', 'ProteinContent', 'TotalTime']
-
+                    'CarbohydrateContent', 'FiberContent', 'SugarContent', 'ProteinContent']
 if 'generated' not in st.session_state:
     st.session_state.generated = False
     st.session_state.recommendations = None
 
 
 class Recommendation:
-    def __init__(self, nutrition_list, nb_recommendations, ingredients_include, ingredients_exclude):
+    def __init__(self, nutrition_list, nb_recommendations, ingredient_txt):
         self.nutrition_list = nutrition_list
         self.nb_recommendations = nb_recommendations
-        self.ingredients_include = ingredients_include
-        self.ingredients_exclude = ingredients_exclude
+        self.ingredient_txt = ingredient_txt
+        pass
 
-    def generate(self):
+    def generate(self, ):
         params = {'n_neighbors': self.nb_recommendations, 'return_distance': False}
-        generator = Generator(self.nutrition_list, self.ingredients_include, self.ingredients_exclude, params)
+        ingredients = self.ingredient_txt.split(';')
+        generator = Generator(self.nutrition_list, ingredients, params)
         recommendations = generator.generate()
+        recommendations = recommendations.json()['output']
         return recommendations
 
 
@@ -32,14 +33,14 @@ class Display:
 
     def display_recommendation(self, recommendations):
         st.subheader('Recommended recipes:')
-        if recommendations is not None:
+        if recommendations != None:
             rows = len(recommendations) // 5
             for column, row in zip(st.columns(5), range(5)):
                 with column:
                     for recipe in recommendations[rows * row:rows * (row + 1)]:
                         recipe_name = recipe['Name']
                         expander = st.expander(recipe_name)
-                        recipe_img = f'<div><center><img src={recipe["image_link"]} alt={recipe_name}></center></div>'
+                        recipe_img = f'<div><center><alt={recipe_name}></center></div>'
                         nutritions_df = pd.DataFrame({value: [recipe[value]] for value in nutrition_values})
 
                         expander.markdown(recipe_img, unsafe_allow_html=True)
@@ -50,22 +51,29 @@ class Display:
                         expander.markdown(f'<h5 style="text-align: center;font-family:sans-serif;">Ingredients:</h5>',
                                           unsafe_allow_html=True)
                         for ingredient in recipe['RecipeIngredientParts']:
-                            expander.markdown(f"- {ingredient}")
+                            expander.markdown(f"""
+                                        - {ingredient}
+                            """)
                         expander.markdown(
                             f'<h5 style="text-align: center;font-family:sans-serif;">Recipe Instructions:</h5>',
                             unsafe_allow_html=True)
                         for instruction in recipe['RecipeInstructions']:
-                            expander.markdown(f"- {instruction}")
+                            expander.markdown(f"""
+                                        - {instruction}
+                            """)
                         expander.markdown(
                             f'<h5 style="text-align: center;font-family:sans-serif;">Cooking and Preparation Time:</h5>',
                             unsafe_allow_html=True)
-                        expander.markdown(
-                            f"- Cook Time       : {recipe['CookTime']}min\n- Preparation Time: {recipe['PrepTime']}min\n- Total Time      : {recipe['TotalTime']}min")
+                        expander.markdown(f"""
+                                - Cook Time       : {recipe['CookTime']}min
+                                - Preparation Time: {recipe['PrepTime']}min
+                                - Total Time      : {recipe['TotalTime']}min
+                            """)
         else:
             st.info('Couldn\'t find any recipes with the specified ingredients', icon="🙁")
 
     def display_overview(self, recommendations):
-        if recommendations is not None:
+        if recommendations != None:
             st.subheader('Overview:')
             col1, col2, col3 = st.columns(3)
             with col2:
@@ -78,7 +86,7 @@ class Display:
             options = {
                 "title": {"text": "Nutrition values", "subtext": f"{selected_recipe_name}", "left": "center"},
                 "tooltip": {"trigger": "item"},
-                "legend": {"orient": "vertical", "left": "left"},
+                "legend": {"orient": "vertical", "left": "left", },
                 "series": [
                     {
                         "name": "Nutrition values",
@@ -96,7 +104,7 @@ class Display:
                     }
                 ],
             }
-            st_echarts(options=options, height="600px")
+            st_echarts(options=options, height="600px", )
             st.caption('You can select/deselect an item (nutrition value) from the legend.')
 
 
@@ -116,21 +124,17 @@ with st.form("recommendation_form"):
     FiberContent = st.slider('FiberContent', 0, 50, 10)
     SugarContent = st.slider('SugarContent', 0, 40, 10)
     ProteinContent = st.slider('ProteinContent', 0, 40, 10)
-    TotalTime = st.slider('TotalTime', 0, 120, 60)
     nutritions_values_list = [Calories, FatContent, SaturatedFatContent, CholesterolContent, SodiumContent,
-                              CarbohydrateContent, FiberContent, SugarContent, ProteinContent, TotalTime]
+                              CarbohydrateContent, FiberContent, SugarContent, ProteinContent]
     st.header('Recommendation options (OPTIONAL):')
     nb_recommendations = st.slider('Number of recommendations', 5, 20, step=5)
-    ingredients_include = st.text_input('Specify ingredients to include in the recommendations separated by ";" :',
-                                        placeholder='Ingredient1;Ingredient2;...')
-    ingredients_exclude = st.text_input('Specify ingredients to exclude from the recommendations separated by ";" :',
-                                        placeholder='Ingredient1;Ingredient2;...')
+    ingredient_txt = st.text_input('Specify ingredients to include in the recommendations separated by ";" :',
+                                   placeholder='Ingredient1;Ingredient2;...')
     st.caption('Example: Milk;eggs;butter;chicken...')
     generated = st.form_submit_button("Generate")
 if generated:
     with st.spinner('Generating recommendations...'):
-        recommendation = Recommendation(nutritions_values_list, nb_recommendations, ingredients_include,
-                                        ingredients_exclude)
+        recommendation = Recommendation(nutritions_values_list, nb_recommendations, ingredient_txt)
         recommendations = recommendation.generate()
         st.session_state.recommendations = recommendations
     st.session_state.generated = True
