@@ -40,10 +40,9 @@ class Display:
                     for recipe in recommendations[rows * row:rows * (row + 1)]:
                         recipe_name = recipe['Name']
                         expander = st.expander(recipe_name)
-                        recipe_img = f'<div><center><alt={recipe_name}></center></div>'
                         nutritions_df = pd.DataFrame({value: [recipe[value]] for value in nutrition_values})
 
-                        expander.markdown(recipe_img, unsafe_allow_html=True)
+
                         expander.markdown(
                             f'<h5 style="text-align: center;font-family:sans-serif;">Nutritional Values (g):</h5>',
                             unsafe_allow_html=True)
@@ -108,7 +107,7 @@ class Display:
             st.caption('You can select/deselect an item (nutrition value) from the legend.')
 
 
-title = "<h1 style='text-align: center;'>Custom Food Recommendation</h1>"
+title = "<h1 style='text-align: center;'>Meal Recommender</h1>"
 st.markdown(title, unsafe_allow_html=True)
 
 display = Display()
@@ -126,7 +125,7 @@ with st.form("recommendation_form"):
     ProteinContent = st.slider('ProteinContent', 0, 40, 10)
     nutritions_values_list = [Calories, FatContent, SaturatedFatContent, CholesterolContent, SodiumContent,
                               CarbohydrateContent, FiberContent, SugarContent, ProteinContent]
-    st.header('Recommendation options (OPTIONAL):')
+    st.header('Recommendation options:')
     nb_recommendations = st.slider('Number of recommendations', 5, 20, step=5)
     ingredient_txt = st.text_input('Specify ingredients to include in the recommendations separated by ";" :',
                                    placeholder='Ingredient1;Ingredient2;...')
