@@ -1,6 +1,8 @@
+import os
 import requests
 import json
 
+backend_url = os.getenv('BACKEND_URL', 'http://127.0.0.1:8000')
 class Generator:
     def __init__(self,nutrition_input:list,ingredients:list=[],params:dict={'n_neighbors':5,'return_distance':False}):
         self.nutrition_input=nutrition_input
@@ -18,5 +20,5 @@ class Generator:
             'ingredients':self.ingredients,
             'params':self.params
         }
-        response=requests.post(url='http://127.0.0.1:8000/predict/',data=json.dumps(request))
+        response=requests.post(url=f'{backend_url}/predict/',data=json.dumps(request))
         return response
