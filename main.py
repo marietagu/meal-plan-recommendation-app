@@ -15,7 +15,7 @@ if not os.path.exists('Data'):
 # Download the file
 gdown.download(url, output, quiet=False)
 
-dataset=pd.read_csv('Data/dataset.csv',compression='gzip')
+dataset=pd.read_csv('Data/dataset.csv')
 
 app = FastAPI()
 
