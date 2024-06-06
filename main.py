@@ -6,7 +6,7 @@ from model import recommend,output_recommended_recipes
 import os
 import gdown
 
-url = "https://drive.google.com/file/d/1rM1COje44Ojl_7YntKL6Ua7_NhRi4wMP/view?usp=sharing"
+url = "https://drive.google.com/file/d/1rM1COje44Ojl_7YntKL6Ua7_NhRi4wMP"
 output = "Data/dataset.csv"
 
 if not os.path.exists('Data'):
