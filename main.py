@@ -3,19 +3,9 @@ from pydantic import BaseModel,conlist
 from typing import List,Optional
 import pandas as pd
 from model import recommend,output_recommended_recipes
-import os
-import gdown
 
-url = "https://drive.google.com/uc?id=1rM1COje44Ojl_7YntKL6Ua7_NhRi4wMP"
-output = "Data/dataset.csv"
 
-if not os.path.exists('Data'):
-    os.makedirs('Data')
-
-# Download the file
-gdown.download(url, output, quiet=False)
-
-dataset=pd.read_csv('Data/dataset.csv')
+dataset=pd.read_csv('Data/dataset.csv',compression='gzip')
 
 app = FastAPI()
 
@@ -65,7 +55,3 @@ def update_item(prediction_input:PredictionIn):
     else:
         return {"output":output}
 
-if __name__ == "__main__":
-    import uvicorn
-    port = int(os.getenv("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
