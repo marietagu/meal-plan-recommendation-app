@@ -1,6 +1,9 @@
 # Ignore dataset files
-Data/*.csv
+# Data/*.csv
 
 # Ignore virtual environment
-venv/fresh_venv/
+venv/
+
 fresh_venv/
+
+.cursorrules
