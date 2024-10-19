@@ -16,7 +16,7 @@ dataset_path = os.path.join(current_dir, 'Data', 'dataset.csv')
 
 # Load the dataset
 try:
-    dataset = pd.read_csv(dataset_path, compression='gzip')
+    dataset = pd.read_csv(dataset_path)
     print(f"Dataset loaded successfully from {dataset_path}")
 except Exception as e:
     print(f"Error loading dataset: {str(e)}")
