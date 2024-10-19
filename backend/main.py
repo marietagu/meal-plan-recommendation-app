@@ -6,8 +6,13 @@ import pandas as pd
 from model import recommend,output_recommended_recipes
 
 
-dataset=pd.read_csv('Data/dataset.csv',compression='gzip')
+# Get the directory of the current file
+current_dir = os.path.dirname(os.path.abspath(__file__))
+# Construct the path to the dataset (one directory up from current_dir)
+dataset_path = os.path.join(os.path.dirname(current_dir), 'Data', 'dataset.csv')
 
+# Load the dataset
+dataset = pd.read_csv(dataset_path, compression='gzip')
 app = FastAPI()
 
 app.add_middleware(

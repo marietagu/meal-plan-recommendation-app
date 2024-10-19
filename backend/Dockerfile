@@ -2,15 +2,15 @@ FROM python:3.10.8
 
 WORKDIR /app
 
+# Copy the Data directory
+COPY Data /app/Data
+
 # Copy all files from the backend directory
-COPY . .
+COPY backend .
 
 # Install dependencies
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-# Make start.sh executable
-RUN chmod +x start.sh
-
 # Command to run the application
-CMD ["./start.sh"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
