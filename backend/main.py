@@ -5,15 +5,23 @@ from typing import List, Optional
 import pandas as pd
 import os
 from model import recommend,output_recommended_recipes
+import logging
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Get the directory of the current file
 current_dir = os.path.dirname(os.path.abspath(__file__))
-# Construct the path to the dataset (in the same directory as current_dir)
 dataset_path = os.path.join(current_dir, 'Data', 'dataset.csv')
 
 # Load the dataset
-dataset = pd.read_csv(dataset_path, compression='gzip')
+try:
+    dataset = pd.read_csv(dataset_path, compression='gzip')
+    print(f"Dataset loaded successfully from {dataset_path}")
+except Exception as e:
+    print(f"Error loading dataset: {str(e)}")
+    dataset = None
+
 app = FastAPI()
 
 app.add_middleware(
@@ -27,7 +35,13 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup_event():
     port = os.environ.get("PORT", 8000)
-    print(f"Starting server on port {port}")
+    logger.info(f"Starting server on port {port}")
+    logger.info(f"Current directory: {current_dir}")
+    logger.info(f"Dataset path: {dataset_path}")
+    if dataset is not None:
+        logger.info("Dataset loaded successfully")
+    else:
+        logger.error("Failed to load dataset")
 
 class params(BaseModel):
     n_neighbors:int=5
@@ -65,12 +79,21 @@ def home():
     return {"health_check": "OK"}
 
 
-@app.post("/predict/",response_model=PredictionOut)
-def update_item(prediction_input:PredictionIn):
-    recommendation_dataframe=recommend(dataset,prediction_input.nutrition_input,prediction_input.ingredients,prediction_input.params.dict())
-    output=output_recommended_recipes(recommendation_dataframe)
-    if output is None:
-        return {"output":None}
+@app.get("/health")
+def health_check():
+    if dataset is not None:
+        return {"status": "OK", "dataset": "loaded"}
     else:
-        return {"output":output}
+        return {"status": "Error", "dataset": "not loaded"}
 
+
+@app.post("/predict/", response_model=PredictionOut)
+def update_item(prediction_input: PredictionIn):
+    if dataset is None:
+        return {"output": None, "error": "Dataset not loaded"}
+    try:
+        recommendation_dataframe = recommend(dataset, prediction_input.nutrition_input, prediction_input.ingredients, prediction_input.params.dict())
+        output = output_recommended_recipes(recommendation_dataframe)
+        return {"output": output}
+    except Exception as e:
+        return {"output": None, "error": str(e)}
