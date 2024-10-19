@@ -2,7 +2,7 @@ import os
 import requests
 import json
 
-backend_url = os.getenv('BACKEND_URL', 'http://127.0.0.1:8000')
+  backend_url = os.getenv('BACKEND_URL', 'https://web-production-2e40.up.railway.app')
 class Generator:
     def __init__(self,nutrition_input:list,ingredients:list=[],params:dict={'n_neighbors':5,'return_distance':False}):
         self.nutrition_input=nutrition_input
