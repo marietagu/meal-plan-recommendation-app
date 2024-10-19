@@ -6,6 +6,10 @@ from streamlit_echarts import st_echarts
 st.set_page_config(page_title="Meal Recommender", layout="wide")
 nutrition_values = ['Calories', 'FatContent', 'SaturatedFatContent', 'CholesterolContent', 'SodiumContent',
                     'CarbohydrateContent', 'FiberContent', 'SugarContent', 'ProteinContent']
+if "BACKEND_URL" not in st.secrets:
+    st.error("BACKEND_URL is not set in the app secrets. Please set it in the Streamlit Cloud settings.")
+    st.stop()
+                        
 if 'generated' not in st.session_state:
     st.session_state.generated = False
     st.session_state.recommendations = None
@@ -18,13 +22,25 @@ class Recommendation:
         self.ingredient_txt = ingredient_txt
         pass
 
-    def generate(self, ):
+    def generate(self):
         params = {'n_neighbors': self.nb_recommendations, 'return_distance': False}
         ingredients = self.ingredient_txt.split(';')
         generator = Generator(self.nutrition_list, ingredients, params)
-        recommendations = generator.generate()
-        recommendations = recommendations.json()['output']
-        return recommendations
+        try:
+            recommendations = generator.generate()
+            if recommendations is None:
+                st.error("Failed to get recommendations from the backend.")
+                return None
+            if not isinstance(recommendations, dict):
+                st.error(f"Unexpected response type: {type(recommendations)}")
+                return None
+            if 'output' not in recommendations:
+                st.error(f"'output' key not found in response. Keys: {recommendations.keys()}")
+                return None
+            return recommendations['output']
+        except Exception as e:
+            st.error(f"An error occurred: {str(e)}")
+            return None
 
 
 class Display:
