@@ -2,8 +2,8 @@ FROM python:3.10.8
 
 WORKDIR /app
 
-# Copy Python files
-COPY main.py model.py ./
+# Copy Python files and dataset
+COPY main.py model.py dataset.csv ./
 
 # Copy requirements file
 COPY requirements.txt .
@@ -18,4 +18,5 @@ COPY . .
 # Expose the port the app runs on
 EXPOSE 8000
 
+# Command to run the application
 CMD ["python", "main.py"]
