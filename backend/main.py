@@ -1,10 +1,10 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel,conlist
+from pydantic import BaseModel, conlist
 from typing import List, Optional
 import pandas as pd
 import os
-from model import recommend,output_recommended_recipes
+from model import recommend, output_recommended_recipes
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -16,10 +16,10 @@ dataset_path = os.path.join(current_dir, 'Data', 'dataset.csv')
 
 # Load the dataset
 try:
-    dataset = pd.read_csv(dataset_path)
-    print(f"Dataset loaded successfully from {dataset_path}")
+    dataset = pd.read_csv(dataset_path, compression='gzip')
+    logger.info(f"Dataset loaded successfully from {dataset_path}")
 except Exception as e:
-    print(f"Error loading dataset: {str(e)}")
+    logger.error(f"Error loading dataset: {str(e)}")
     dataset = None
 
 app = FastAPI()
@@ -44,14 +44,13 @@ async def startup_event():
         logger.error("Failed to load dataset")
 
 class params(BaseModel):
-    n_neighbors:int=5
-    return_distance:bool=False
+    n_neighbors: int = 5
+    return_distance: bool = False
 
 class PredictionIn(BaseModel):
-    nutrition_input:conlist(float, min_items=9, max_items=9)
+    nutrition_input: conlist(float, min_items=9, max_items=9)
     ingredients: List[str] = []
-    params:Optional[params]
-
+    params: Optional[params]
 
 class Recipe(BaseModel):
     Name: str
@@ -73,11 +72,9 @@ class Recipe(BaseModel):
 class PredictionOut(BaseModel):
     output: Optional[List[Recipe]] = None
 
-
 @app.get("/")
 def home():
     return {"health_check": "OK"}
-
 
 @app.get("/health")
 def health_check():
@@ -86,8 +83,14 @@ def health_check():
     else:
         return {"status": "Error", "dataset": "not loaded"}
 
-
 @app.post("/predict/", response_model=PredictionOut)
 def update_item(prediction_input: PredictionIn):
     if dataset is None:
         return {"output": None, "error": "Dataset not loaded"}
+    
+    recommendation_dataframe = recommend(dataset, prediction_input.nutrition_input, prediction_input.ingredients, prediction_input.params.dict())
+    output = output_recommended_recipes(recommendation_dataframe)
+    if output is None:
+        return {"output": None}
+    else:
+        return {"output": output}
