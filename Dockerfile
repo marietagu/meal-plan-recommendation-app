@@ -2,9 +2,9 @@ FROM python:3.10.8
 
 WORKDIR /app
 
-# Copy only necessary files
+# Copy backend files and requirements
 COPY backend /app/backend
-COPY requirements.txt /app
+COPY backend/requirements.txt /app/
 
 # Install dependencies
 RUN pip install --upgrade pip
