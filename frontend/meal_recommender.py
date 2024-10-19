@@ -9,7 +9,7 @@ nutrition_values = ['Calories', 'FatContent', 'SaturatedFatContent', 'Cholestero
 if "BACKEND_URL" not in st.secrets:
     st.error("BACKEND_URL is not set in the app secrets. Please set it in the Streamlit Cloud settings.")
     st.stop()
-                        
+
 if 'generated' not in st.session_state:
     st.session_state.generated = False
     st.session_state.recommendations = None
@@ -20,7 +20,6 @@ class Recommendation:
         self.nutrition_list = nutrition_list
         self.nb_recommendations = nb_recommendations
         self.ingredient_txt = ingredient_txt
-        pass
 
     def generate(self):
         params = {'n_neighbors': self.nb_recommendations, 'return_distance': False}
