@@ -2,8 +2,7 @@ FROM python:3.10.8
 
 WORKDIR /app
 
-# Copy only necessary files
-COPY ../Data ./Data
+# Copy all files from the current directory
 COPY . .
 
 # Install dependencies
