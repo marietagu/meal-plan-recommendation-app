@@ -2,16 +2,12 @@ FROM python:3.10.8
 
 WORKDIR /app
 
-# Copy only necessary files
-COPY backend /app/backend
-COPY requirements.txt /app
+# Copy backend files
+COPY backend /app
 
 # Install dependencies
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
-
-# Set the working directory to /app/backend
-WORKDIR /app/backend
 
 # Make start.sh executable
 RUN chmod +x start.sh
