@@ -9,9 +9,5 @@ COPY . .
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-# Make start.sh executable
-COPY start.sh .
-RUN chmod +x start.sh
-
-# Use start.sh as the entry point
-CMD ["./start.sh"]
+# Command to run the application
+CMD uvicorn main:app --host 0.0.0.0 --port $PORT

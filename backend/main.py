@@ -18,6 +18,11 @@ app.add_middleware(
     allow_headers=["*"],  # Allows all headers
 )
 
+@app.on_event("startup")
+async def startup_event():
+    port = os.environ.get("PORT", 8000)
+    print(f"Starting server on port {port}")
+
 class params(BaseModel):
     n_neighbors:int=5
     return_distance:bool=False
