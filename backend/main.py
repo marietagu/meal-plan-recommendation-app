@@ -91,9 +91,3 @@ def health_check():
 def update_item(prediction_input: PredictionIn):
     if dataset is None:
         return {"output": None, "error": "Dataset not loaded"}
-    try:
-        recommendation_dataframe = recommend(dataset, prediction_input.nutrition_input, prediction_input.ingredients, prediction_input.params.dict())
-        output = output_recommended_recipes(recommendation_dataframe)
-        return {"output": output}
-    except Exception as e:
-        return {"output": None, "error": str(e)}
