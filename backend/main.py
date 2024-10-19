@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel,conlist
 from typing import List,Optional
 import pandas as pd
@@ -9,6 +10,13 @@ dataset=pd.read_csv('Data/dataset.csv',compression='gzip')
 
 app = FastAPI()
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
 
 class params(BaseModel):
     n_neighbors:int=5
