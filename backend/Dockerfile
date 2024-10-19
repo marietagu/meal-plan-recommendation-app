@@ -2,11 +2,9 @@ FROM python:3.10.8
 
 WORKDIR /app
 
-# Copy the Data directory
-COPY Data /app/Data
-
-# Copy all files from the backend directory
-COPY backend .
+# Copy only necessary files
+COPY ../Data ./Data
+COPY . .
 
 # Install dependencies
 RUN pip install --upgrade pip

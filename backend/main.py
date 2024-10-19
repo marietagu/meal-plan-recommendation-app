@@ -1,8 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel,conlist
-from typing import List,Optional
+from typing import List, Optional
 import pandas as pd
+import os
 from model import recommend,output_recommended_recipes
 
 
@@ -34,26 +35,26 @@ class params(BaseModel):
 
 class PredictionIn(BaseModel):
     nutrition_input:conlist(float, min_items=9, max_items=9)
-    ingredients:list[str]=[]
+    ingredients: List[str] = []
     params:Optional[params]
 
 
 class Recipe(BaseModel):
-    Name:str
-    CookTime:str
-    PrepTime:str
-    TotalTime:str
-    RecipeIngredientParts:list[str]
-    Calories:float
-    FatContent:float
-    SaturatedFatContent:float
-    CholesterolContent:float
-    SodiumContent:float
-    CarbohydrateContent:float
-    FiberContent:float
-    SugarContent:float
-    ProteinContent:float
-    RecipeInstructions:list[str]
+    Name: str
+    CookTime: str
+    PrepTime: str
+    TotalTime: str
+    RecipeIngredientParts: List[str]
+    Calories: float
+    FatContent: float
+    SaturatedFatContent: float
+    CholesterolContent: float
+    SodiumContent: float
+    CarbohydrateContent: float
+    FiberContent: float
+    SugarContent: float
+    ProteinContent: float
+    RecipeInstructions: List[str]
 
 class PredictionOut(BaseModel):
     output: Optional[List[Recipe]] = None
