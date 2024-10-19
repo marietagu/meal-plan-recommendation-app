@@ -1,0 +1,31 @@
+.
+├── Dockerfile
+├── EDA & Data modeling.html
+├── EDA & Data modeling.ipynb
+├── EDA & Data modeling.pdf
+├── LICENSE
+├── Procfile
+├── README.md
+├── __pycache__
+│   ├── generator.cpython-310.pyc
+│   ├── main.cpython-310.pyc
+│   └── model.cpython-310.pyc
+├── backend
+│   ├── Data
+│   │   └── dataset.csv
+│   ├── main.py
+│   ├── model.py
+│   ├── requirements.txt
+│   └── start.sh
+├── docker-compose.yml
+├── frontend
+│   ├── generator.py
+│   ├── meal_recommender.py
+│   └── requirements.txt
+├── normalize_notebook.py
+├── output.txt
+├── railway.toml
+├── requirements_full.txt
+└── runtime.txt
+
+5 directories, 24 files
